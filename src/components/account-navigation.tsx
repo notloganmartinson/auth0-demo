@@ -1,17 +1,34 @@
 import Link from "next/link";
 import { accountNavigation } from "@/lib/navigation";
+import { auth0 } from "@/lib/auth0";
 import { Icon } from "./icon";
 
-// This is always the same public navigation. Add user-aware presentation here later.
-export function AccountNavigation() {
+export async function AccountNavigation() {
+  const session = await auth0.getSession();
+
+  if (!session) {
+    return (
+      <div className="account-nav">
+        <a href={accountNavigation.login.href}>
+          {accountNavigation.login.label}
+        </a>
+
+        <a
+          href={accountNavigation.signup.href}
+          className="signup-link"
+        >
+          {accountNavigation.signup.label}
+        </a>
+      </div>
+    );
+  }
+
   return (
     <div className="account-nav">
-      <Link href={accountNavigation.login.href}>
-        {accountNavigation.login.label}
-      </Link>
-      <Link href={accountNavigation.signup.href} className="signup-link">
-        {accountNavigation.signup.label}
-      </Link>
+      <span>
+        Hi, {session.user.given_name ?? session.user.name}
+      </span>
+
       <Link
         href={accountNavigation.account.href}
         className="icon-link"
@@ -19,6 +36,8 @@ export function AccountNavigation() {
       >
         <Icon name="user" />
       </Link>
+
+      <a href="/auth/logout">Log Out</a>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth0 } from "@/lib/auth0";
 import { demoProfile, demoOrders } from "@/lib/account-demo";
 import { getProduct, formatPrice } from "@/lib/products";
 import { ProductImage } from "@/components/product-image";
@@ -7,24 +9,39 @@ import { Icon } from "@/components/icon";
 
 export const metadata: Metadata = { title: "My account" };
 
-// Authentication and route protection will be added by the project owner later.
-// This route is intentionally PUBLIC. All profile/order content is a static fixture.
-export default function AccountPage() {
+export default async function AccountPage() {
+  const session = await auth0.getSession();
+
+  if (!session) {
+    redirect("/auth/login?returnTo=/account");
+  }
+
+  const { user } = session;
+  const name = user.name ?? user.given_name ?? "Your account";
+  const greetingName = user.given_name ?? user.name ?? "there";
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
+
   return (
     <div className="container page-section">
       <div className="account-demo-note">
-        Account preview · Sample customer data · Public page
+        Your account · Sample orders, shipping address, and settings
       </div>
       <div className="page-intro">
         <span className="eyebrow">Your corner of Northstar</span>
-        <h1>Welcome back, Alex.</h1>
+        <h1>Welcome back, {greetingName}.</h1>
         <p>Good to see you. Here’s what’s happening in your wardrobe.</p>
       </div>
       <div className="account-layout">
         <aside className="account-sidebar">
           <div className="profile-card">
-            <span className="avatar">{demoProfile.initials}</span>
-            <strong>{demoProfile.name}</strong>
+            <span className="avatar">{initials}</span>
+            <strong>{name}</strong>
             <span>Part of the everyday since {demoProfile.memberSince}</span>
           </div>
           <nav aria-label="Account sections">
@@ -101,11 +118,11 @@ export default function AccountPage() {
               <h2>Your profile</h2>
               <dl>
                 <dt>Name</dt>
-                <dd>{demoProfile.name}</dd>
+                <dd>{name}</dd>
                 <dt>Email address</dt>
-                <dd>{demoProfile.email}</dd>
+                <dd>{user.email ?? "Not provided"}</dd>
               </dl>
-              <p className="field-note">Sample profile · Display only</p>
+              <p className="field-note">Profile · Display only</p>
             </section>
             <section id="addresses" className="account-panel">
               <span className="eyebrow">Home is where it lands</span>

@@ -1,10 +1,9 @@
-// Temporary destinations only. Replace these when you personally add authentication.
-// No SDK assumptions, session state, or authentication behavior lives here.
 export const accountNavigation = {
-  login: { label: "Log In", href: "/login" },
-  signup: { label: "Create Account", href: "/signup" },
+  login: { label: "Log In", href: "/auth/login?returnTo=/account" },
+  signup: { label: "Create Account", href: "/auth/login?screen_hint=signup&returnTo=/account" },
   account: { label: "My Account", href: "/account" },
 } as const;
+// /auth/login starts the Auth0 login transaction, after finishing authentication takes user to /account page. 
 
 export const shopNavigation = [
   { label: "Men", href: "/shop?gender=Men" },

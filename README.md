@@ -72,6 +72,7 @@ src/
     commerce.ts                Shared shipping calculation
     navigation.ts              Central account destinations and shop navigation
     account-demo.ts            Static sample customer/order fixtures
+    auth0.ts                   Central connection to Auth0 SDK, does not login just creates tool app uses (car)
 public/images/                 Original locally stored campaign and catalog imagery
 docs/image-assets.md           Asset provenance and generation prompts
 ```
